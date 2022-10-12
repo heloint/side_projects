@@ -1,0 +1,33 @@
+.search-bar{
+  width: 30%;
+  /* position: absolute; */
+  /* top: 35%;
+  left: 65%;
+  transform: translate(-50%, -45%); */
+  border-radius: 15px;
+  border: 3px solid #818589;
+}
+
+.search {
+  width: 100%;
+  position: relative;
+  display: flex;
+}
+
+.searchTerm {
+  width: 100%;
+  padding: 5px;
+  height: 30px;
+  outline: none;
+}
+
+.searchSubmit{
+    width: 40px;
+    height: 43px;
+}
+
+.searchTerm,
+.searchSubmit{
+    border: none;
+    border-radius: 15px;
+}
