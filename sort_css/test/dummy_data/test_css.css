@@ -1,0 +1,54 @@
+.menu-bar{
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.menu_duplicate {
+    opacity:0.8;
+    text-align: center; padding: 10px 0px; }
+
+.menu{
+    display: inline-block;
+    background-color: #d9d9d9; background-image: linear-gradient(350deg, rgb(217,217,217, 0) 0%, #f6f2f2 74%); opacity:0.8;
+    text-align: center;
+    padding: 10px 0px;
+    margin: 0 auto; border-radius: 10px 10px 10px 10px; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.menu a{
+    padding: 12px;
+    opacity: 2; border-radius: 10px 10px 10px 10px;
+    color: black; cursor: pointer; }
+
+.menu a:hover{ background-color: #BBBFCA; }
+
+
+
+
+.menu-bar_duplicate {
+    height: 5rem;
+    display: flex;
+}
+
+
+.menu_duplicate a{ padding: 12px; opacity: 2; color: black;
+    cursor: pointer;
+}
