@@ -20,12 +20,10 @@ def recurse( html_groups, collector_dict):
 
 
 def parse(html_string):
-    """parse the html string to json."""
-
     soup: bs4.BeautifulSoup = bs4.BeautifulSoup(html_string, 'html.parser')
 
-    l = [child for child in soup.contents]
-    return recurse( l, {})
+    child_ls = [child for child in soup.contents]
+    return recurse( child_ls, {})
 
 with open('../test/dummy_data/sample.html', 'r', encoding='UTF-8') as file:
     data = file.read()
