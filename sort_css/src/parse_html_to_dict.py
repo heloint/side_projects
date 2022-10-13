@@ -1,7 +1,21 @@
-import bs4
-from pprint import pprint
+import bs4  # type: ignore
+from typing import Any
 
-def recurse( html_groups, collector_dict):
+
+def read_html(path: str) -> str:
+    """Reads the html file."""
+
+    with open(path, "r", encoding="UTF-8") as file:
+        html_content = file.read()
+
+    return html_content
+
+
+def recurse(
+    html_groups: list[bs4.BeautifulSoup | Any],
+    collector_dict: dict[str, list[str | dict] | dict[str, str | list]],
+) -> dict[str, list[str | dict] | dict[Any, Any]]:
+    """Recursively iterates the BeautifulSoup4.html_parse return."""
 
     for group in html_groups:
         if not isinstance(group, str):
@@ -9,24 +23,37 @@ def recurse( html_groups, collector_dict):
             if not group.name in collector_dict:
                 collector_dict[group.name] = []
 
-            tmp_collector = {}
+            tmp_collector: dict[str, Any] = {}
 
             if group.attrs:
-                tmp_collector = {'attributes': group.attrs}
+                tmp_collector = {"attributes": group.attrs}
 
-            collector_dict[group.name] += (recurse( group, tmp_collector),)
+            collector_dict[group.name] += (recurse(group, tmp_collector),)  # type: ignore
 
     return collector_dict
 
 
-def parse(html_string):
-    soup: bs4.BeautifulSoup = bs4.BeautifulSoup(html_string, 'html.parser')
+def parse(html_string: str) -> dict[str, list[Any] | dict[Any, Any]]:
+    """Recursively parses the html_groups from BeautifulSoup4.html_parse and
+    fetches to a hierarchical dictionary."""
 
-    child_ls = [child for child in soup.contents]
-    return recurse( child_ls, {})
+    soup: bs4.BeautifulSoup = bs4.BeautifulSoup(html_string, "html.parser")
 
-with open('../test/dummy_data/sample.html', 'r', encoding='UTF-8') as file:
-    data = file.read()
+    child_ls: list[bs4.PageElement] = [child for child in soup.contents]
 
-t = parse(data)
-pprint(t)
+    return recurse(child_ls, {})
+
+
+def convert_html_to_dict(path: str) -> dict[str, list[Any] | dict[Any, Any]]:
+    """Converts html to dictionary."""
+
+    html_content: str = read_html(path)
+    html_dict = parse(html_content)
+
+    return html_dict
+
+
+if __name__ == "__main__":
+    html_dict: dict[str, list[Any] | dict[Any, Any]] = convert_html_to_dict(
+                                                "../test/dummy_data/sample.html"
+                                                )
