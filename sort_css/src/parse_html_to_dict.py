@@ -1,5 +1,6 @@
 import bs4  # type: ignore
 from typing import Any
+from itertools import chain
 
 
 def read_html(path: str) -> str:
@@ -52,8 +53,50 @@ def convert_html_to_dict(path: str) -> dict[str, list[Any] | dict[Any, Any]]:
 
     return html_dict
 
+def get_identifiers_in_order(html_dict: dict[str, list[Any]]):
+   
+
+    start_node = html_dict
+
+    if 'html' in html_dict.keys():
+        start_node = html_dict['html'][0]['body'][0]
+
+    for k, v in start_node.items():
+
+        elem_collector: list[str] = [k]
+
+        if isinstance(v, list):
+            
+            if 'attributes' in v[0]:
+                if 'id' in v[0]['attributes']:
+                    elem_collector += v[0]['attributes']['id'],
+                if 'class' in v[0]['attributes']:
+                    elem_collector += v[0]['attributes']['class'],
+            
+            yield elem_collector
+            yield from get_identifiers_in_order(v[0])
+
+def reformat_multidim_ls(ids_in_order):
+
+    duplicate_checker: set = set()
+
+    for identifier in chain(*ids_in_order):
+
+        if isinstance(identifier, list):
+            for elem in identifier:
+                if elem not in duplicate_checker:
+                    duplicate_checker.add(elem)
+                    yield elem
+        else:
+            if identifier not in duplicate_checker:
+                duplicate_checker.add(identifier)
+                yield identifier
 
 if __name__ == "__main__":
     html_dict: dict[str, list[Any] | dict[Any, Any]] = convert_html_to_dict(
                                                 "../test/dummy_data/sample.html"
                                                 )
+    
+    ids_in_order = tuple(get_identifiers_in_order(html_dict))
+    flattened_id_ls = tuple(reformat_multidim_ls(ids_in_order))
+    print(flattened_id_ls)
