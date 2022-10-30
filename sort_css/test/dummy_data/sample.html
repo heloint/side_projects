@@ -1,3 +1,39 @@
+<?php
+/* 3. Program that opens a file with text (selected by the user from among those
+   available) and indicates in a table the number of words starting with each
+   letter.
+ */
+
+require_once './lib/upload.php';
+use uploadExercise\handleFiles as handleFiles;
+
+$storageFiles = handleFiles\checkStorage('./data');
+
+/* echo '$storageFiles </br> ============================</br>';
+var_dump($storageFiles);
+echo '</br>==============================</br>'; */
+
+// If the submit button has been shot, then triggers the rest of the functions.
+if (isset($_POST['upload']) &&
+    is_uploaded_file($_FILES['file']['tmp_name'])){
+
+        $checkFlag = handleFiles\checkFile($_FILES['file']);
+
+        $storageFlag = handleFiles\lookForDuplicates($_FILES['file']['name'], 
+                                                     $storageFiles
+                                                    );
+
+        $result = handleFiles\storeFile($_FILES['file'], 
+                                        './data', 
+                                        $checkFlag, 
+                                        $storageFlag
+                                       );
+
+        $storageFiles = handleFiles\checkStorage('./data');
+
+}
+?>
+
 <!DOCTYPE html>
 <html lang=en>
 <head>
@@ -5,68 +41,54 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/style.css">
-    <script src="./js/script.js" defer></script>
-    <title>Document</title>
+    <title>Upload files</title>
 </head>
 <body>
+    <div class="banner-container">
+        <h3><u>Upload files</u></h3> 
+    </div>
+
     <div class="form-container">
         <div class="form-wrapper">
-            <h3 class="register-banner"><u>Register form ♠</u></h3>
-            <p style="font-size: 14px♠"><sup>*</sup> This form uses prompt. Click the buttons to input values.</p>
-            <form>
-                <!-- FIRST NAME-->
-                <div class="input-container">
-                    <!-- <label for="firstName">First name</label> -->
-                    <button class="firstName input-field" name="firstName" placeholder="First name.."> First name</button>
-                    <input readonly id="firstName" class="input-field" type="text" name="firstName" placeholder="First name..">
-                    <p class="error-output firstName-error"></p>
+            <form action="index.php" method="post" enctype="multipart/form-data">
+                <div class="upload-field">
+                    <label for="file"><u>Upload your file here</u></label>
+                    <input type="file" name="file">
                 </div>
-                <!-- END: FIRST NAME-->
-
-                <!-- END: LAST NAME-->
-                <div class="input-container">
-                    <!-- <label for="lastName">Last name</label> -->
-                    <button class="lastName input-field" name="lastName" placeholder="Last name.."> Last name</button>
-                    <input readonly id="lastName" class="input-field" type="text" name="lastName" placeholder="Last name..">
-                    <p class="error-output lastName-error"></p>
+                <div class="submit-wrapper">
+                    <button class="button" type="submit" name="upload">Upload</button>
                 </div>
-                <!-- END: LAST NAME-->
-
-                <!-- EMAIL-->
-                <div class="input-container">
-                    <!-- <label for="email">E-mail</label> -->
-                    <button class="email input-field" type="email" name="email" placeholder="Email address.."> E-mail</button>
-                    <input readonly id="email" class="input-field" type="email" name="email" placeholder="Email address..">
-                    <p class="error-output email-error"></p>
-                </div>
-                <!-- END: EMAIL-->
-
-                <!-- DNI -->
-                <div class="input-container">
-                    <!-- <label for="dni">DNI</label> -->
-                    <button class="dni input-field" name="dni" placeholder="DNI number.." maxlength="9"> DNI</button>
-                    <input readonly id="dni" class="input-field" type="text" name="dni" placeholder="DNI number.." maxlength="9">
-                    <p class="error-output dni-error"></p>
-                </div>
-                <!-- END: DNI -->
-
-                <!-- DATE OF BIRTH -->
-                <div class="input-container">
-                    <!-- <label for="dateOfBirth">Date of birth</label> -->
-                    <button class="dateOfBirth input-field" type="date" name="dateOfBirth" placeholder="Date of birth..">Date of birth</button>
-                    <input readonly id="dateOfBirth" class="input-field" type="text" name="dateOfBirth" placeholder="Date of birth..">
-                    <p class="error-output dateOfBirth-error"></p>
-                </div>
-                <!-- END: DATE OF BIRTH -->
-
-                <button id="submitButton" class="button" type="submit">Register</button>
-
-            </form> 
+            </form>
         </div>
-        <div class="result-container">
-            <div class="result-wrapper">
-            </div>
+    </div> 
+    
+    <div id="test_id" class="output-container">
+        <div class="output-wrapper">
+        <?php
+            echo $result['resultMessage'] ?? '';
+        ?>
         </div>
     </div>
+
+    <div class="form-container">
+        <div class="form-wrapper">
+        <?php
+            $radioFormHTML = handleFiles\fetchRadioButtons($storageFiles);
+            echo $radioFormHTML;
+        ?>
+        </div>
+    </div>
+
+    <div class="output-container">
+        <div class="output-wrapper">
+        <?php
+            if (isset($_POST['read'])){
+                printf('<p><u>Content of "%s"</u></p>', $_POST['selectedFile']);
+                echo handleFiles\getFileContent('./data', $_POST['selectedFile']);
+            }
+        ?>
+        </div>
+    </div>
+
 </body>
 </html>
