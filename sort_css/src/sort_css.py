@@ -1,3 +1,5 @@
+import argparse
+
 import re
 import cssutils  # type: ignore
 import logging
@@ -10,7 +12,7 @@ from typing import Generator, Dict
 cssutils.log.setLevel(logging.CRITICAL)  # type: ignore
 
 
-def read_css(path: str) -> str:
+def read_file(path: str) -> str:
     "Reads css.."
 
     with open(path, "r", encoding="UTF-8") as file:
@@ -69,7 +71,13 @@ def format_css_dict(
     }
 
 
-def reorder_css_by_html(css_dict, html_element_order):
+def sort_css_by_keys(css_dict):
+    
+    return {key: css_dict[key] for key in sorted(css_dict)}
+
+
+
+def sort_css_by_html(css_dict, html_element_order):
 
     result = {}
     order_collector = []
@@ -90,21 +98,24 @@ def generate_output_str(css_by_html: Dict[str, Dict[str, str]]) -> str:
     result_str: str = ''
 
     for key, value in css_by_html.items():
-        result_str += f"{value['comment']}\n"
+
+        if value['comment']:
+            result_str += f"\n{value['comment']}\n"
+        else:
+            result_str += '\n'
+
         result_str += f"{key} {{\n"
 
         for prop in value['props']:
-            result_str += f"    {prop}\n"
+            result_str += f"    {prop};\n"
 
         result_str += "}\n"
 
     return result_str
 
-
-
 if __name__ == "__main__":
 
-    css_content = read_css("../test/dummy_data/test_css.css")
+    css_content = read_file("../test/dummy_data/test_css.css")
 
     css_dict: dict[str, dict[str, str]] = css_to_dict(css_content)
 
@@ -112,11 +123,62 @@ if __name__ == "__main__":
 
     # THis part is for that case if the "by_html" flag is used.
     # ================
-    ordered_html_elems: Generator[str, None, None] = get_html_element_order("../test/dummy_data/sample.html")
+    # ordered_html_elems: Generator[str, None, None] = get_html_element_order("../test/dummy_data/sample.html")
 
-    css_by_html: Dict[str, Dict[str, str]] = reorder_css_by_html(formated_css_dict, ordered_html_elems )
+    # css_by_html: Dict[str, Dict[str, str]] = sort_css_by_html(formated_css_dict, ordered_html_elems )
+    t = sort_css_by_keys(formated_css_dict)
 
-    css_by_html_output: str = generate_output_str(css_by_html)
-    print(css_by_html_output)
+    css_by_html_output: str = generate_output_str(t)
 
+# ====================
+def main():
 
+    parser = argparse.ArgumentParser(
+        prog="sort_css", description="Sorts css declarations."
+    )
+    parser.add_argument(
+        "filenames", metavar="target", nargs='*', help="CSS file's path."
+    )
+    parser.add_argument(
+        "--by_html",
+        action="store",
+        type=str,
+        help="Order CSS declarations by HTML's order.",
+    )
+    parser.add_argument(
+        "-i",
+        "--in_place",
+        action="store_true",
+        help="Edits file in-place.",
+    )
+
+    args = parser.parse_args()
+
+    filenames = args.filenames
+    by_html = args.by_html
+    in_place = args.in_place
+
+    for file_path in filenames:
+        css_content = read_file(file_path)
+
+        css_dict: dict[str, dict[str, str]] = css_to_dict(css_content)
+        formated_css_dict: dict[str, dict[str, str | list[str]]] = format_css_dict(css_dict)
+        
+        # ===============================
+        if by_html:
+            ordered_html_elems: Generator[str, None, None] = get_html_element_order(by_html)
+            sorted_css: Dict[str, Dict[str, str]] = sort_css_by_html(formated_css_dict, ordered_html_elems )
+        else:
+            sorted_css = sort_css_by_keys(formated_css_dict)
+        # ===============================
+
+        css_output = generate_output_str(sorted_css)
+
+        if in_place:
+            with open(file_path, 'w', encoding='UTF-8') as file:
+                file.write(css_output)
+        else:
+            print(css_output)
+
+if __name__ == '__main__':
+    main()
