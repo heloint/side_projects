@@ -1,7 +1,7 @@
 import argparse
 
 import re
-import cssutils  # type: ignore
+import cssutils
 import logging
 from get_html_element_order import get_html_element_order
 from typing import Generator, Dict
@@ -9,7 +9,7 @@ from typing import Generator, Dict
 # To silence the warnings and error messages in stdout while using cssutils.parseString.
 # It's not informative, doesn't affect the funcionality
 # of the stylesheet and unnecessarly verbose.
-cssutils.log.setLevel(logging.CRITICAL)  # type: ignore
+cssutils.log.setLevel(logging.CRITICAL) #type: ignore
 
 
 def read_file(path: str) -> str:
@@ -71,7 +71,7 @@ def format_css_dict(
     }
 
 
-def sort_css_by_keys(css_dict):
+def sort_css_by_keys(css_dict) -> Dict[str, Dict[str, str]]:
     
     return {key: css_dict[key] for key in sorted(css_dict)}
 
@@ -169,16 +169,18 @@ def main():
             ordered_html_elems: Generator[str, None, None] = get_html_element_order(by_html)
             sorted_css: Dict[str, Dict[str, str]] = sort_css_by_html(formated_css_dict, ordered_html_elems )
         else:
-            sorted_css = sort_css_by_keys(formated_css_dict)
+            sorted_css: Dict[str, Dict[str, str]]= sort_css_by_keys(formated_css_dict)
         # ===============================
 
         css_output = generate_output_str(sorted_css)
 
+        # ===============================
         if in_place:
             with open(file_path, 'w', encoding='UTF-8') as file:
                 file.write(css_output)
         else:
             print(css_output)
+        # ===============================
 
 if __name__ == '__main__':
     main()
