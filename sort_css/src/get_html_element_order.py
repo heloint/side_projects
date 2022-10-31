@@ -1,7 +1,6 @@
 import bs4  # type: ignore
 from typing import Any,Dict,List, Generator
 from itertools import chain
-import pandas as pd
 
 
 def read_html(path: str) -> str:

@@ -5,9 +5,10 @@ from get_html_element_order import get_html_element_order
 from typing import Generator, Dict
 
 # To silence the warnings and error messages in stdout while using cssutils.parseString.
-# It's not informative, doesn't affect the funcionality 
+# It's not informative, doesn't affect the funcionality
 # of the stylesheet and unnecessarly verbose.
 cssutils.log.setLevel(logging.CRITICAL)  # type: ignore
+
 
 def read_css(path: str) -> str:
     "Reads css.."
@@ -31,9 +32,7 @@ def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
             comment = rule.cssText
         else:
             if rule.selectorText not in css_dict.keys():
-                css_dict.setdefault(rule.selectorText, {"comment": "", 
-                                                        "props": ""
-                                                        })
+                css_dict.setdefault(rule.selectorText, {"comment": "", "props": ""})
 
             css_dict[rule.selectorText]["comment"] = comment
             css_dict[rule.selectorText]["props"] = rule.style.cssText
@@ -45,60 +44,61 @@ def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
 
 def format_css_dict(
     css_dict: dict[str, dict[str, str]]
-                    ) -> dict[str, dict[str, str | list[str]]]:
+) -> dict[str, dict[str, str | list[str]]]:
     "Separates the str dump of properties into a list[str]."
 
     formated_css_dict: dict[str, dict[str, str | list[str]]] = {}
     for selectors, values in css_dict.items():
-        split_properties = re.split(";", values["props"])
-        split_properties = [prop.replace("\n", "").strip() 
-                                for prop in split_properties]
+        split_properties: list[str] = re.split(";", values["props"])
+        split_properties = [prop.replace("\n", "").strip() for prop in split_properties]
 
-        for selector in selectors.split(','): 
+        for selector in selectors.split(","):
+            selector = selector.strip()
 
-            formated_css_dict.setdefault(
-                selector, {"comment": values["comment"], 
-                           "props": sorted(split_properties)}
-            )
+            if selector not in formated_css_dict:
+                formated_css_dict.setdefault(
+                    selector, {"comment": values["comment"], "props": split_properties}
+                )
+            else:
+                formated_css_dict[selector]["comment"] += values["comment"]
+                formated_css_dict[selector]["props"] += split_properties
 
-    return formated_css_dict
-
-
-def generate_css_strings(
-        formated_dict: dict[str, dict[str, str | list[str]]]
-                                            ) -> dict[str, str]:
-    '''Converts the formated css dictionary 
-       into (selector: pretty_string) dictionary.'''
-
-    sorted_properties_dict: dict[str, str] = {}
-
-    for selector, values in formated_dict.items():
-        pretty_str: str = f"{values['comment']}\n"
-        pretty_str += f"{selector} {{\n"
-
-        for prop in values["props"]:
-            pretty_str += f"    {prop};\n"
-
-        pretty_str += "}"
-
-        sorted_properties_dict[selector] = pretty_str
-
-    return sorted_properties_dict
+    return {
+        key: {"comment": value["comment"], "props": sorted(value["props"])}
+        for key, value in formated_css_dict.items()
+    }
 
 
+def reorder_css_by_html(css_dict, html_element_order):
 
-def  reorder_properties_dict(html_elem_order: Generator[str, None, None], properties_dict: Dict[str, str]) -> Dict[str, str]:
+    result = {}
+    order_collector = []
+    for html_elem in html_element_order:
+        for css, value in css_dict.items():
 
+            if (
+                list(filter(None, re.split(" |:", css)))[0].strip() == html_elem
+                and css not in result
+            ):
+                order_collector.append(css)
+                result[css] = value
 
-    for key, value in properties_dict.items():
-        for identifier in html_elem_order:
-            if identifier in key:
+    return result
 
-                try: 
-                    yield (key.strip(), value)
-                except KeyError:
-                    continue
+def generate_output_str(css_by_html: Dict[str, Dict[str, str]]) -> str:
+    
+    result_str: str = ''
 
+    for key, value in css_by_html.items():
+        result_str += f"{value['comment']}\n"
+        result_str += f"{key} {{\n"
+
+        for prop in value['props']:
+            result_str += f"    {prop}\n"
+
+        result_str += "}\n"
+
+    return result_str
 
 
 
@@ -108,17 +108,15 @@ if __name__ == "__main__":
 
     css_dict: dict[str, dict[str, str]] = css_to_dict(css_content)
 
-    formated_css_dict: dict[str, 
-                            dict[str, 
-                                 str | list[str]]] = format_css_dict(css_dict)
-   
+    formated_css_dict: dict[str, dict[str, str | list[str]]] = format_css_dict(css_dict)
+
     # THis part is for that case if the "by_html" flag is used.
     # ================
-    t = get_html_element_order("../test/dummy_data/sample.html")
+    ordered_html_elems: Generator[str, None, None] = get_html_element_order("../test/dummy_data/sample.html")
 
-    x = ((key, formated_css_dict[key]) for key in t if any(key in identifier for identifier in formated_css_dict))
-    
-    for i, j in dict(x).items():
-        print('=======')
-        print(i, j)
-        print('=======')
+    css_by_html: Dict[str, Dict[str, str]] = reorder_css_by_html(formated_css_dict, ordered_html_elems )
+
+    css_by_html_output: str = generate_output_str(css_by_html)
+    print(css_by_html_output)
+
+
