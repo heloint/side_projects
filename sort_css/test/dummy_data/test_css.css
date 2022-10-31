@@ -1,9 +1,58 @@
 
+body {
+    background: white;
+}
+
 .banner-container {
     align-items: center;
     background: #BEBEBE;
     display: flex;
     justify-content: center;
+}
+
+.form-container {
+    align-items: center;
+    background: linear-gradient(90deg, rgba(218, 226, 218, 1) 26%, rgba(199, 199, 209, 1) 100%, rgba(0, 255, 23, 1) 100%);
+    background: rgb(218, 226, 218);
+    border-radius: 5px;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    margin: 0.8rem 0 0 0;
+    padding: 1rem;
+    padding: 2rem;
+}
+
+.form-wrapper {
+    align-items: center;
+    background: linear-gradient(90deg, rgba(218, 226, 218, 1) 26%, rgba(199, 199, 209, 1) 100%, rgba(0, 255, 23, 1) 100%);
+    background: rgb(218, 226, 218);
+    border-radius: 5px;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    margin: 0.8rem 0 0 0;
+    padding: 1rem;
+    padding: 2rem;
+}
+
+.upload-field {
+    align-items: center;
+    display: grid;
+    justify-content: center;
+}
+
+.submit-wrapper {
+    align-items: center;
+    background: linear-gradient(90deg, rgba(218, 226, 218, 1) 26%, rgba(199, 199, 209, 1) 100%, rgba(0, 255, 23, 1) 100%);
+    background: rgb(218, 226, 218);
+    border-radius: 5px;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    margin: 0.8rem 0 0 0;
+    padding: 1rem;
+    padding: 2rem;
 }
 
 .button {
@@ -34,32 +83,6 @@
     box-shadow: #C0C0C0 0 0 0 3px, transparent 0 0 0 0;
 }
 
-.form-container {
-    align-items: center;
-    background: linear-gradient(90deg, rgba(218, 226, 218, 1) 26%, rgba(199, 199, 209, 1) 100%, rgba(0, 255, 23, 1) 100%);
-    background: rgb(218, 226, 218);
-    border-radius: 5px;
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    margin: 0.8rem 0 0 0;
-    padding: 1rem;
-    padding: 2rem;
-}
-
-.form-wrapper {
-    align-items: center;
-    background: linear-gradient(90deg, rgba(218, 226, 218, 1) 26%, rgba(199, 199, 209, 1) 100%, rgba(0, 255, 23, 1) 100%);
-    background: rgb(218, 226, 218);
-    border-radius: 5px;
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    margin: 0.8rem 0 0 0;
-    padding: 1rem;
-    padding: 2rem;
-}
-
 .output-container {
     align-items: center;
     background: linear-gradient(90deg, rgba(218, 226, 218, 1) 26%, rgba(199, 199, 209, 1) 100%, rgba(0, 255, 23, 1) 100%);
@@ -80,29 +103,4 @@
 /*TEST COMMENT*/
 .output-wrapper p {
     text-align: center;
-}
-
-.radio-btn-wrapper {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.submit-wrapper {
-    align-items: center;
-    background: linear-gradient(90deg, rgba(218, 226, 218, 1) 26%, rgba(199, 199, 209, 1) 100%, rgba(0, 255, 23, 1) 100%);
-    background: rgb(218, 226, 218);
-    border-radius: 5px;
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    margin: 0.8rem 0 0 0;
-    padding: 1rem;
-    padding: 2rem;
-}
-
-.upload-field {
-    align-items: center;
-    display: grid;
-    justify-content: center;
 }
