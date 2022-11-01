@@ -14,7 +14,7 @@ import cssutils  # type: ignore
 # To silence the warnings and error messages in stdout while using cssutils.parseString.
 # It's not informative, doesn't affect the funcionality
 # of the stylesheet and unnecessarly verbose.
-cssutils.log.setLevel(logging.CRITICAL)  # type: ignore
+cssutils.log.setLevel(logging.CRITICAL)
 
 def read_file(path: str) -> str:
 
