@@ -16,61 +16,12 @@ import cssutils  # type: ignore
 # of the stylesheet and unnecessarly verbose.
 cssutils.log.setLevel(logging.CRITICAL)  # type: ignore
 
-# CHECKED
-# =======
 def read_file(path: str) -> str:
 
     with open(path, "r", encoding="UTF-8") as file:
         css_content = file.read()
 
     return css_content
-
-
-def _parse(
-    html_string: str,
-) -> Dict[str, List[str | Dict[str, Any]] | Dict[str, str | List[Any]]]:
-    """Recursively parses the html_groups from BeautifulSoup4.html_parse and
-    fetches to a hierarchical dictionary."""
-
-    soup: bs4.BeautifulSoup = bs4.BeautifulSoup(html_string, "html.parser")
-
-    child_ls: list[bs4.PageElement] = [child for child in soup.contents]
-
-    return recurse(child_ls, {})
-
-
-def convert_html_to_dict(
-    path: str,
-) -> Dict[str, List[Any] | Any]:
-    "Converts html to dictionary calling on _parse function."
-    return _parse(read_file(path))
-
-
-def get_identifiers_in_order(html_dict: List[Dict[str, List[Any]]]) -> Generator[str, None, None]:
-    """Starting from the body tag, recurses the html tree, and yield all the
-    tags, IDs and class names."""
-
-    start_node: List[Dict[str, List[Any]]] = html_dict
-
-    if "body" in html_dict[0]:
-        yield "body"
-        start_node = html_dict[0]["body"]
-
-    for dictionary in start_node:
-        for key, value in dictionary.items():
-
-            if key == "attributes":
-                if "id" in value:
-                    yield f"#{value['id']}"  # type: ignore
-                if "class" in value:
-                    for class_name in value["class"]:  # type: ignore
-                        yield f".{class_name}"
-
-            yield key
-
-            if isinstance(value, list):
-                yield from get_identifiers_in_order(value)
-
 
 def recurse(
     html_groups: Union[bs4.BeautifulSoup, Any], collector_dict: Dict[Any, Any]
@@ -98,17 +49,96 @@ def recurse(
     return collector_dict
 
 
+def _parse(
+    html_string: str,
+) -> Dict[str, List[str | Dict[str, Any]] | Dict[str, str | List[Any]]]:
+    """Recursively parses the html_groups from BeautifulSoup4.html_parse and
+    fetches to a hierarchical dictionary."""
+
+    soup: bs4.BeautifulSoup = bs4.BeautifulSoup(html_string, "html.parser")
+
+    child_ls: list[bs4.PageElement] = [child for child in soup.contents]
+
+    return recurse(child_ls, {})
+
+
+def convert_html_to_dict(
+    path: str,
+) -> Dict[str, List[Any] | Any]:
+    "Converts html to dictionary calling on _parse function."
+    return _parse(read_file(path))
+
+
+def get_identifiers_in_order(html_dict: List[Dict[str, List[Any]]] | Dict[str, List[Any]]) -> Generator[str, None, None]:
+    """Starting from the body tag, recurses the html tree, and yield all the
+    tags, IDs and class names."""
+
+    start_node: List[Dict[str, List[Any]]] | Dict[str, List[Any]] = html_dict
+
+    if isinstance(html_dict, list):
+        if "body" in html_dict[0]:
+            yield "body"
+            start_node = html_dict[0]["body"]
+
+    # Could be reduced with some smart move, but don't bother doing it. The
+    # more explicit is, the easier is to debug.
+    # ======================================================================
+    if isinstance(start_node, list):
+        for dictionary in start_node:
+            for key, value in dictionary.items():
+
+                if key == "attributes":
+                    if "id" in value:
+                        yield f"#{value['id']}"  # type: ignore
+                    if "class" in value:
+                        for class_name in value["class"]:  # type: ignore
+                            yield f".{class_name}"
+
+                if key != 'attributes':
+                    yield key
+
+                if isinstance(value, list):
+                    yield from get_identifiers_in_order(value)
+
+    elif isinstance(start_node, dict):
+            for key, value in start_node.items():
+
+                if key == "attributes":
+                    if "id" in value:
+                        yield f"#{value['id']}"  # type: ignore
+                    if "class" in value:
+                        for class_name in value["class"]:  # type: ignore
+                            yield f".{class_name}"
+
+                if key != 'attributes':
+                    yield key
+
+                if isinstance(value, list):
+                    yield from get_identifiers_in_order(value)
+    # ======================================================================
+
+
+
 def get_html_element_order(path: str) -> Tuple[str, ...]:
     """Runs all the parsing and recursing functions, then returns the
     identifiers in the same order as in the html tree."""
 
     html_dict: Dict[str, List[Any] | Any] = convert_html_to_dict(path)
-    identifiers_in_order = get_identifiers_in_order(html_dict["html"])
+
+    identifiers_in_order: Generator[str, None, None]
+
+    try:
+        identifiers_in_order = get_identifiers_in_order(html_dict["html"])
+
+    # If KeyError occurs, that means, that the HTML is only partial, not a
+    # full-fetched HTML page.
+    except KeyError: 
+        identifiers_in_order = get_identifiers_in_order(html_dict)
+
 
     identifiers_without_dups: Tuple[str, ...] = tuple(
         dict.fromkeys(identifiers_in_order)
     )
-
     return identifiers_without_dups
 
 
@@ -131,7 +161,7 @@ def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
             css_dict[rule.selectorText]["props"] = rule.style.cssText
 
             comment = ""
-
+    print(css_dict)
     return css_dict
 
 
