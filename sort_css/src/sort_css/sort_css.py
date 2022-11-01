@@ -161,7 +161,6 @@ def css_to_dict(css_content: str) -> dict[str, dict[str, str]]:
             css_dict[rule.selectorText]["props"] = rule.style.cssText
 
             comment = ""
-    print(css_dict)
     return css_dict
 
 
@@ -199,14 +198,14 @@ def format_css_dict(
     }
 
 
-def sort_css_by_keys(css_dict) -> Dict[str, Dict[str, str]]:
+def sort_css_by_keys(css_dict: Dict[str, Dict[str, str | List[str]]]) -> Dict[str, Dict[str, str | List[str]]]:
     """Orders the tags alphabetically, then ids, classes alphabetically.
     Return both as a merged dictionary."""
 
-    tags: Dict[str, Dict[str, str]] = {
+    tags: Dict[str, Dict[str, str | List[str]]] = {
         key: css_dict[key] for key in sorted(css_dict) if not key.startswith((".", "#"))
     }
-    ids_classes: Dict[str, Dict[str, str]] = {
+    ids_classes: Dict[str, Dict[str, str | List[str]]] = {
         key: css_dict[key] for key in sorted(css_dict) if key.startswith((".", "#"))
     }
 
@@ -215,11 +214,11 @@ def sort_css_by_keys(css_dict) -> Dict[str, Dict[str, str]]:
 
 def sort_css_by_html(
     css_dict: Dict[str, Dict[str, Any]], html_element_order: Tuple[str, ...]
-) -> Dict[str, Dict[str, str]]:
+) -> Dict[str, Dict[str, str | List[str]]]:
     """Loops through the html_element_order identifiers, and return the
     key-value from css_dict in the order of the identifiers."""
 
-    result: Dict[str, Dict[str, str]] = {}
+    result: Dict[str, Dict[str, str | List[str]]] = {}
 
     for html_elem in html_element_order:
         for css, value in css_dict.items():
@@ -234,7 +233,7 @@ def sort_css_by_html(
     return result
 
 
-def generate_output_str(css_dict: Dict[str, Dict[str, str]]) -> str:
+def generate_output_str(css_dict: Dict[str, Dict[str, str | List[str]]]) -> str:
     "Loops through the CSS dictionary, then returns the content as a formated string."
 
     result_str: str = ""
@@ -299,7 +298,7 @@ def main() -> None:
         )
 
         # ===============================
-        sorted_css: Dict[str, Dict[str, str]]
+        sorted_css: Dict[str, Dict[str, str | List[str]]]
 
         if by_html:
             ordered_html_elems: Tuple[str, ...] = get_html_element_order(by_html)
