@@ -4,6 +4,7 @@ import pytest
 sys.path.append("../src/sort_css")
 
 import sort_css
+
 from typing import Generator
 from .expected_output_vars import EXPECTED_HTML_DICT 
 from .expected_output_vars import EXPECTED_INCOMPLETE_HTML_DICT 
