@@ -25,6 +25,11 @@ Result directly goes to stdout.
 sort_css test_dir/test_css.css
 ```
 
+File will be edited in-place with the result.
+```bash
+sort_css -i test_dir/test_css.css
+```
+
 Redirect the stdout to a new file.
 ```bash
 sort_css test_dir/test_css.css > test_dir/cleaned_css.css
