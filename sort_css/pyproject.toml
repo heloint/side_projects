@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sort_css_heloint"
-version = "0.0.2"
+name = "sort_css"
+version = "0.0.1"
 authors = [{name="Dániel Májer", email="majerdaniel93@gmail.com"}]
 description = "Tool for sorting CSS file declarations."
 readme = "README.md"
