@@ -18,8 +18,30 @@ Common options:
 - `--by_html BY_HTML`  Order CSS declarations by HTML's order.
 - `-i, --in_place`     Edits file in-place.
 
-## What does it do?
+## Usage examples
 
+Result directly goes to stdout.
+```bash
+sort_css test_dir/test_css.css
+```
+
+Redirect the stdout to a new file.
+```bash
+sort_css test_dir/test_css.css > test_dir/cleaned_css.css
+```
+
+Result reordered by html directly goes to stdout.
+```bash
+sort_css test_dir/test_css.css
+```
+
+Reorder by html and redirect the stdout to a new file.
+```bash
+sort_css test_dir/test_css.css --by_html test_dir/test_html.html > test_dir/cleaned_css.css
+```
+
+
+## What does it do?
 
 ### Without `--by_html` flag.
 #### Separates block of grouped declarations and reorders them alphabetically the following way.
