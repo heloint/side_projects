@@ -1,0 +1,46 @@
+/*FORM GENERAL*/
+/* ====================== */
+.form-container,
+.form-wrapper,
+.form-wrapper form,
+.form-wrapper form div {
+	display: grid;
+	align-items: center;
+	justify-content: center;
+}
+
+.form-wrapper {
+	width: fit-content;
+	padding: 1rem;
+	border: 1px solid lightgrey;
+	border-radius: 5px;
+	background: linear-gradient(109.6deg, rgb(248,248,248) 30.1%, rgb(144,144,144) 100.2%);
+}
+
+.form-wrapper form {
+	gap: 1rem;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.form-wrapper form div {
+	gap: 0.5rem;
+}
+
+.form-wrapper form label {
+	text-align: center;
+	font-weight: 450;
+}
+
+.form-wrapper form label+input {
+	font-size: 16px;
+}
+/* ====================== */
+
+
+h1 {
+    color: red;
+}
